@@ -1,72 +1,55 @@
-/**
- * jquery.nagareboshi
- *
- * @params flakeChar - 漂浮图标样式, 默认是雪花, 其它漂亮符号参考： ❥ღ❣♔♕♖♚♛♜☀☁☂☃☼☽☾♨❄❅❆★☆✦✪✫✿
- * @params minSize - 默认size最小是10
- * @params maxSize - 默认size最大是20
- * @params newOn - 出现新图标的频率，默认是500
- * @params flakeColors - 默认的图标颜色 , 默认是#FFFFFF
- * @params durationMillis - 停止加载图标的时间，默认是一直加载
- * @example $.fn.nagareboshi({ maxSize: 200, newOn: 1000 });
+/*
+    @params flakeChar:图标
+    @params minSize:最少尺寸
+    @params maxSize:最多尺寸
+    @params newOn：新图标出现的频率
+    @params flakeColor:颜色
  */
-; (function ($, window, document, undefined) {
+;(function(w,d,u,$){
+    $.fn.showPic=function(options){
+        var defaults={
+            flakeChar:"&#10047;",
+            minSize:10,
+            maxSize:100,
+            newOn:100,
+            flakeColor:['pink','blue','green']
+        };
+        $.extend(defaults,options);
+        //生成一个节点 用于存这个图标
+        var $flake=$("<div></div>").css({"position":"absolute","top":"-50"});
+        //设置出现的位置
+        //页面多大
+        var documentHeight=$(d).height();
+        var documentWidth=$(d).width();
 
-    $.fn.nagareboshi = function (options) {
-
-        var $flake = $('<div class="flake"></div>').css({ 'position': 'absolute', 'top': '-50px' }),
-            documentHeight = $(document).height(),
-            documentWidth = $(document).width(),
-            defaults = {
-                flakeChar: "&#10052;",
-                minSize: 10,
-                maxSize: 20,
-                newOn: 100,
-                flakeColor: ["#ffffff"],
-                durationMillis: null
-            };
-
-        // 当给extend方法传递一个以上的参数时，它会将所有参数对象合并到第一个里。同时，如果对象中有同名属性时，合并的时候后面的会覆盖前面的。
-        // 所以如果传递进来的options参数有的值，将会覆盖defaults对象里对应的值
-        $.extend(defaults, options);
-        
         $flake.html(defaults.flakeChar);
 
-        var interval = setInterval(function () {
-            var startPositionLeft = Math.random() * documentWidth - 100,
-                startOpacity = 0.5 + Math.random(),
-                sizeFlake = defaults.minSize + Math.random() * defaults.maxSize,
-                endPositionTop = documentHeight - defaults.maxSize - 40,
-                endPositionLeft = startPositionLeft - 100 + Math.random() * 200,
-                durationFall = documentHeight * 10 + Math.random() * 5000;
-            $flake
-                .clone()
-                .appendTo('body')
-                .css(
-                    {
-                        left: startPositionLeft,
-                        opacity: startOpacity,
-                        'font-size': sizeFlake,
-                        color: defaults.flakeColor[Math.floor((Math.random() * defaults.flakeColor.length))]
-                    }
-                )
-                .animate(
-                    {
-                        top: endPositionTop,
-                        left: endPositionLeft,
-                        opacity: 0.2
-                    },
-                    durationFall,
-                    'linear',
-                    function () {
-                        $(this).remove()
-                    }
-                );
-        }, defaults.newOn);
-        if (defaults.durationMillis) {
-            setTimeout(function () {
-                clearInterval(interval);
-            }, defaults.durationMillis);
-        }
-    };
+        //定时器操作
+        //启动定时器
+        setInterval(function(){
+            //计算起始位置
+            var startPositionLeft=Math.random()*documentWidth-100;// div 的x坐标
+            var startOpacity=Math.random()+0.5;//透明度
+            var sizeFlake=defaults.minSize + Math.random()*defaults.maxSize;//雪花大小
+            var endPositionLeft=startPositionLeft-100+Math.random()*200;
+            var endPositionTop=documentHeight-defaults.maxSize;
+            var durationFall=documentHeight*5+Math.random()*5000;
 
-})(jQuery, window, document);
+            $flake.clone()
+                .appendTo("body")
+                .css({
+                    left:startPositionLeft,
+                    opacity:startOpacity,
+                    'font-size':sizeFlake,
+                    color:defaults.flakeColor
+                })
+                .animate({
+                    top:endPositionTop,
+                    left:endPositionLeft,
+                    opacity:0.1
+                },durationFall,'linear',function(){
+                    $(this).remove();
+                })
+        },100)
+    }
+})(window,document,undefined,$)
